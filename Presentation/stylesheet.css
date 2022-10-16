@@ -1,0 +1,179 @@
+/* Cascade Style Sheet for this website */
+body {
+    background-color:white;
+    max-width: 800px;
+    margin: auto;
+    margin-bottom: 45px;
+  }
+
+h1 {
+  height:48px;
+  width: auto;
+  text-align: center;
+  color: #04AA6D;
+}
+
+ul.menu {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  /* width: 150px; */
+  background-color: navy;
+}
+
+ul.menu > li {
+  float: left;
+}
+
+ul.menu > li > a {
+  display: block;
+  border: 1px solid rgb(54, 54, 54) ;
+  color: white;
+  text-align: center;
+  padding: 8px 16px;
+  text-decoration: none;
+}
+
+ul.menu > li:first-child > a {
+  border-right: none ;
+}
+
+ul.menu > li:last-child > a {
+  border-left: none ;
+}
+
+ul.menu > li > a:hover {
+  background-color: #555;
+  color: white;
+}
+
+ul.menu > li > a.active {
+  background-color: #04AA6D;
+  color: white;
+}
+
+p {
+  font-size: 12px;
+  color: darkslategrey;
+  background-color: white;
+}
+
+ul.regular {
+  font-size: 12px;
+  color: darkslategrey;
+  list-style-type: square;
+  overflow: hidden;
+}
+
+div {
+  max-width: 800px;
+  margin: left;
+}
+
+footer {
+  height: 40px;
+  background-color: black;
+  color: white;
+  position: fixed;
+  bottom: 0;
+  width: 800px;
+  text-align: right;
+}
+
+footer > p {
+  background-color: black;
+  color: white;
+  margin-right: 15px;
+}
+
+.form {
+  max-width: 800px;
+  display: block;
+}
+
+.form label {
+  margin: 5px 10px 5px 0;
+  font-size: 12px;
+  text-align: right;
+  /* width: 100px;
+  display: inline-block; */
+}
+
+.form label.otherlabel {
+  margin: 5px 10px 5px 0;
+  font-size: 12px;
+  text-align: right;
+  width: 100px;
+  display: inline-block;
+}
+
+.form input {
+  vertical-align: middle;
+  margin: 5px 10px 5px 0;
+  padding: 10px;
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+}
+
+.form select {
+  vertical-align: middle;
+  margin: 5px 10px 5px 0;
+  padding: 10px;
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+}
+
+/* Contactform styling */
+.contactform {
+  max-width: 800px;
+  display: block;
+}
+
+.contactform label {
+  margin: 5px 10px 5px 0;
+  font-size: 12px;
+  text-align: right;
+  /* width: 100px;
+  display: inline-block; */
+}
+
+.contactform label.field {
+  margin: 5px 10px 5px 0;
+  font-size: 12px;
+  text-align: right;
+  width: 100px;
+  display: inline-block;
+}
+
+.contactform input {
+  vertical-align: middle;
+  margin: 5px 10px 5px 0;
+  padding: 10px;
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+}
+
+.contactform select {
+  vertical-align: middle;
+  margin: 5px 10px 5px 0;
+  padding: 10px;
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+}
+
+select:required:invalid {
+  color: gray;
+}
+option[value=""][disabled] {
+  display: none;
+}
+
+.form textarea {
+  height: 150px;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  background-color: #f8f8f8;
+  resize: none;
+}
