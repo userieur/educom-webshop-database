@@ -56,6 +56,25 @@
 
 
     // BUSINESS
+
+    function getAllProducts() {
+        $conn = connectDatabase('r_webshop');
+        $sql = $sql = "SELECT * from products";
+        $items = readData($conn, $sql);
+        mysqli_close($conn);
+        return $items;
+    }
+
+    function getProductById($id) {
+        $conn = connectDatabase('r_webshop');
+        $sql = $sql = "SELECT * from products WHERE id='".$id."'";
+        $items = readData($conn, $sql);
+        $values = array_values($items);
+        $output = $values[0];
+        mysqli_close($conn);
+        return $output;
+    }
+       
     function doesEmailExist($email) {
         $userInfo = findUserByEmail($email);
         $emailExists = false;
@@ -71,7 +90,9 @@
         $email = $userInfo['email'];
         $sql = "INSERT INTO users (email, username, password) VALUES ('".$email."','".$username."','".$password."')";
         echo($sql);
-        writeData('r_webshop', $sql);
+        $conn = connectDatabase('r_webshop');
+        writeData($conn, $sql);
+        mysqli_close($conn);
     }
 
     function updatePassword($userInfo) {
@@ -82,25 +103,14 @@
         updateData('r_webshop', $sql);
     }    
 
-    function authenticateUser() {
-        $userInfo = findUserByEmail($email);
-        // return NULL / Array
-    }
-
     // SESSION MANAGER
     function doLoginUser($userInfo) {
-        // session_start();
         $_SESSION['user'] = $userInfo['username'];
         $_SESSION['email'] = $userInfo['email'];
-        $_SESSION['password'] = $userInfo['password'];
     }
 
     function isUserLoggedIn() {
-        $loggedIn = false;
-        if (isset($_SESSION['user'])) {
-            $loggedIn = true;
-        }
-        return $loggedIn;
+        return isset($_SESSION['user']);
     }
 
     function getLoggedInUser() {
@@ -109,26 +119,18 @@
 
     function doLogoutUser() {
         session_unset();
-        // session_destroy();
     }
 
     // DATA
-    // Data Access Object
-    // File repository
 
     function FindUserByEmail($email) {      
         $sql = "SELECT * from users WHERE email = '" . $email . "'";
-        $output = readData('r_webshop', $sql);
-        $output = $output[0];
+        $conn = connectDatabase('r_webshop');
+        $output = readData($conn, $sql);
+        $values = array_values($output);
+        $output = $values[0];
+        mysqli_close($conn);
         return $output;
-    }
-
-    function findUserById($id) {
-
-    }
-
-    function findUserByUsername($username) {
-
     }
 
     function connectDatabase($dbname) {
@@ -145,47 +147,39 @@
         return $conn;
     }
 
-    function readData($dbname, $sql) {
-        $conn = connectDatabase($dbname);
+    function readData($conn, $sql) {
         $output = array();
         $result = mysqli_query($conn, $sql);
 
         if (mysqli_num_rows($result) > 0) {
             while($row = mysqli_fetch_assoc($result)) {
+                if (isset($row['id'])) {
+                    $output[$row['id']] = $row;
+                } else {
                 $output[] = $row;
+                }
             }
-          } else {
-            $output = "NO_DATA_FOUND";
-          }
-        mysqli_close($conn);
+        } else {
+        $output = "NO_DATA_FOUND";
+        }
         return $output;
     }
 
-    function writeData($dbname, $sql) {
-        $conn = connectDatabase($dbname);
+    function writeData($conn, $sql) {
         if (mysqli_query($conn, $sql)) {
             echo "New record created successfully";
           } else {
             echo "Error: " . $sql . "<br>" . mysqli_error($conn);
           }
-        mysqli_close($conn);
     }
 
-    function updateData($dbname, $sql) {
-        $conn = connectDatabase($dbname);
+    function updateData($conn, $sql) {
         if (mysqli_query($conn, $sql)) {
             // echo "Record updated successfully";
           } else {
             echo "Error: " . $sql . "<br>" . mysqli_error($conn);
           }
-        mysqli_close($conn);
     }
-
-    function removeData() {
-
-    }
-
-
 
 ?>
 

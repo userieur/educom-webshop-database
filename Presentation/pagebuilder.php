@@ -74,6 +74,14 @@
                     $data = NULL;
                 }
                 break;
+            case 'webshop':
+                $id = getUrlVar('id');
+                $detail_item = getDetailData($id);
+                var_dump($detail_item);
+                $data = $detail_item;
+                break;
+            case 'detail':
+                break;
             default:
                 //default
                 break;
@@ -150,6 +158,12 @@
             case 'updated':
                 showUpdatedHeader();
                 break;
+            case 'webshop':
+                showWebshopHeader();
+                break;
+            case 'detail':
+                showDetailHeader();
+                break;
             default:
                 $page = 'home';
                 require_once('Pages/'.$page.'.php');
@@ -161,12 +175,12 @@
         }
     }
 
-
     function showMenu($page) { 
         echo '<ul class="menu">
                 <li><a class="' . (($page == "home") ? "active" : "") . '"href="index.php?page=home">Home</a></li>
                 <li><a class="' . (($page == "about") ? "active" : "") . '"href="index.php?page=about">About</a></li>
                 <li><a class="' . (($page == "contact") ? "active" : "") . '"href="index.php?page=contact">Contact</a></li>
+                <li><a class="' . (($page == "webshop") ? "active" : "") . '"href="index.php?page=webshop">Webshop</a></li>
               </ul>';        
     }
 
@@ -212,9 +226,22 @@
                 $data = $data ?? getLoginData()['formArray'];
                 showLoginContent ($page, $data);
                 break;
-            case 'userpage';
+            case 'userpage':
                 $data = $data ?? getUserData()['formArray'];
                 showUserContent($page, $data);
+                break;
+            case 'webshop':
+                $data = $data ?? getWebshopData();
+                showWebshopContent($page, $data);
+                showItems($data);
+                break;
+            case 'detail':
+                $id = getUrlVar('id');
+                $detail_item = getDetailData($id);
+                // var_dump($detail_item);
+                $data = $detail_item;
+                showDetailContent($data);
+                showDetailItem($data);
                 break;
             default:
                 require_once('Pages/home.php');
@@ -230,4 +257,40 @@
             </footer>
             ';
     } 
+
+    function showItems($data) {
+        foreach($data as $key => $info) {
+            $id = $key;
+            $name = $info['name'];
+            $imageurl = $info['imageurl'];
+            $price = $info['price'];
+            $description = $info['description'];
+            echo '
+                <div>
+                    <p>ID = '.$id.'</p><br>
+                    <p>Name = <a href="index.php?page=detail&id='.$id.'">'.$name.'</a></p><br>
+                    <p>Imageurl = '.$imageurl.'</p><br>
+                    <p>Price = '.$price.'</p><br>
+                    <p>Description = '.$description.'</p><br>
+                </div>
+            ';
+        }
+    }
+
+    function showDetailItem($info) {
+        $id = $info['id'];
+        $name = $info['name'];
+        $imageurl = $info['imageurl'];
+        $price = $info['price'];
+        $description = $info['description'];
+        echo '
+            <div>
+                <p>ID = '.$id.'</p><br>
+                <p>Name = <a href="index.php?page=detail&id='.$id.'">'.$name.'</a></p><br>
+                <p>Imageurl = '.$imageurl.'</p><br>
+                <p>Price = '.$price.'</p><br>
+                <p>Description = '.$description.'</p><br>
+            </div>
+        ';
+    }
 ?>
