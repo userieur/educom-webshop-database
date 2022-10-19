@@ -30,7 +30,6 @@
         switch ($page) {
             case 'contact':
                 $formArray = getContactData()['formArray'];
-                $fileString = getContactData()['fileString'] ?? NULL;
                 $data = validateForm($formArray);
                 if ($data['validForm']) {
                     $page = 'thanks';
@@ -38,32 +37,42 @@
                 break;
             case 'registratie':
                 $formArray = getRegData()['formArray'];
-                $fileString = getRegData()['fileString'] ?? NULL;
-                $data = validateForm($formArray, $fileString);
+                $data = validateForm($formArray);
                 if ($data['validForm']) {
-                    $username = $data['uname']['value'];
-                    $email = $data['email']['value'];
-                    $password = $data['pword']['value'];
-                    $userinfo = array($email, $username, $password);
-                    storeUser($fileString, $userinfo);
+                    $userInfo = array();
+                    $userInfo += ['username' => $data['uname']['value']];
+                    $userInfo += ['email' => $data['email']['value']];
+                    $userInfo += ['password' => $data['pword']['value']];
+                    storeUser($userInfo);
                     $page = 'login';
                     $data = NULL;
                 }
                 break;
             case 'login':
                 $formArray = getLoginData()['formArray'];
-                $fileString = getLoginData()['fileString'] ?? NULL;
-                $data = validateForm($formArray, $fileString);
+                $data = validateForm($formArray);
                 if ($data['validForm']) {
                     $page = 'home';
                     $email = $data['email']['value'];
-                    $userInfo = findUserByEmail($fileString, $email);
+                    $userInfo = findUserByEmail($email);
                     doLoginUser($userInfo);
                     $data = NULL;
                 }
                 break;
             case 'thanks':
                 //logoout
+                break;
+            case 'userpage':
+                $formArray = getUserData()['formArray'];
+                $data = validateForm($formArray);
+                if ($data['validForm']) { 
+                    $userInfo = array();
+                    $userInfo += ['email' => $_SESSION['email']];
+                    $userInfo += ['password' => $data['pword']['value']];
+                    updatePassword($userInfo);
+                    $page = 'updated';
+                    $data = NULL;
+                }
                 break;
             default:
                 //default
@@ -135,8 +144,11 @@
             case 'login':
                 showLoginHeader();
                 break;
-            case 'userpage';
+            case 'userpage':
                 showUserHeader();
+                break;
+            case 'updated':
+                showUpdatedHeader();
                 break;
             default:
                 $page = 'home';
@@ -190,17 +202,19 @@
                 showRegContent($page, $data);
                 break;
             case 'thanks':
-                // var_dump($data);
                 $data = $data ?? getContactData()['formArray'];
-                // var_dump($data);
                 showThanksContent($data);
+                break;
+            case 'updated':
+                showUpdatedContent();
                 break;
             case 'login':
                 $data = $data ?? getLoginData()['formArray'];
                 showLoginContent ($page, $data);
                 break;
             case 'userpage';
-                showUserContent();
+                $data = $data ?? getUserData()['formArray'];
+                showUserContent($page, $data);
                 break;
             default:
                 require_once('Pages/home.php');

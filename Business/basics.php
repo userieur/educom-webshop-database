@@ -33,8 +33,6 @@
         }
         return ($infoValue);
     }
-
-
     
     function buildFormArray ($array) {
         // var_dump($array);
@@ -58,42 +56,43 @@
 
 
     // BUSINESS
-    function doesEmailExist($fileString, $email) {
-        $userInfo = findUserByEmail($fileString, $email);
+    function doesEmailExist($email) {
+        $userInfo = findUserByEmail($email);
         $emailExists = false;
-        if ($userInfo !== Null) {
+        if ($userInfo !== "NO_DATA_FOUND") {
             $emailExists = true;
         }
         return $emailExists;
     }
 
-    function passwordMatchEmail($fileString, $value) {
-        $userInfo = findUserByEmail($fileString, $value);
-        $match = false;
-        if ($value == $userInfo[2]) {
-            $match = true;
-        }
-        return $match;
+    function storeUser($userInfo) {
+        $username = $userInfo['username'];
+        $password = $userInfo['password'];
+        $email = $userInfo['email'];
+        $sql = "INSERT INTO users (email, username, password) VALUES ('".$email."','".$username."','".$password."')";
+        echo($sql);
+        writeData('r_webshop', $sql);
     }
+
+    function updatePassword($userInfo) {
+        $email = $userInfo['email'];
+        $password = $userInfo['password'];
+        $sql = "UPDATE users SET password='".$password."' WHERE email='".$email."'";
+        // echo($sql);
+        updateData('r_webshop', $sql);
+    }    
 
     function authenticateUser() {
-        $userInfo = findUserByEmail($fileString, $email);
+        $userInfo = findUserByEmail($email);
         // return NULL / Array
-    }
-
-    function storeUser($fileString, $userInfo) {
-        $myFile = addToFile($fileString);
-        $line = implode("|", $userInfo)."\n";
-        fwrite($myFile, $line);
-        closeFile($myFile);
     }
 
     // SESSION MANAGER
     function doLoginUser($userInfo) {
         // session_start();
-        $_SESSION['user'] = $userInfo[1];
-        $_SESSION['email'] = $userInfo[0];
-        $_SESSION['password'] = $userInfo[2];
+        $_SESSION['user'] = $userInfo['username'];
+        $_SESSION['email'] = $userInfo['email'];
+        $_SESSION['password'] = $userInfo['password'];
     }
 
     function isUserLoggedIn() {
@@ -116,59 +115,70 @@
     // DATA
     // Data Access Object
     // File repository
-    function findUserByEmail($fileString, $email) {
-        $myFile = readOnlyFile($fileString);
-        while(!feof($myFile)) {
-            $lineArray = explode("|", fgets($myFile));
-            if ($lineArray[0] == $email) {
-                $userInfo = $lineArray;
-            }
-        }
-        closeFile($myFile);
-        $output = $userInfo ?? NULL;
+
+    function FindUserByEmail($email) {      
+        $sql = "SELECT * from users WHERE email = '" . $email . "'";
+        $output = readData('r_webshop', $sql);
+        $output = $output[0];
         return $output;
     }
 
-
-    function findUserById() {
-
-    }
-
-    function findUserByUsername() {
+    function findUserById($id) {
 
     }
 
-    function createFileString ($directory, $fileName) {
-        $directory = trim($directory, "/");
-        $file = $fileName;
-        $fileString = $directory.'/'.$file;
-        return $fileString;
-    }
-
-    function readOnlyFile($fileString) {
-        $myFile = fopen($fileString, "r") or die("Unable to open file!");
-        return $myFile;
-    }
-
-    function addToFile($fileString) {
-        $myFile = fopen($fileString, "a") or die("Unable to open file!");
-        return $myFile;
-    }
-
-    function closeFile($file) {
-        fclose($file);
-    }
-
-    function readData() {
+    function findUserByUsername($username) {
 
     }
 
-    function writeData() {
+    function connectDatabase($dbname) {
+        $servername = "127.0.0.1";
+        $username = "r_webshop_usr";
+        $password = "Z6zFwtYvjGGq5Y";
+        $dbname = $dbname;
 
+        $conn = mysqli_connect($servername, $username, $password, $dbname);
+
+        if (!$conn) {
+            die("Connection failed: " . mysqli_connect_error());
+          }
+        return $conn;
     }
 
-    function updateData() {
+    function readData($dbname, $sql) {
+        $conn = connectDatabase($dbname);
+        $output = array();
+        $result = mysqli_query($conn, $sql);
 
+        if (mysqli_num_rows($result) > 0) {
+            while($row = mysqli_fetch_assoc($result)) {
+                $output[] = $row;
+            }
+          } else {
+            $output = "NO_DATA_FOUND";
+          }
+        mysqli_close($conn);
+        return $output;
+    }
+
+    function writeData($dbname, $sql) {
+        $conn = connectDatabase($dbname);
+        if (mysqli_query($conn, $sql)) {
+            echo "New record created successfully";
+          } else {
+            echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+          }
+        mysqli_close($conn);
+    }
+
+    function updateData($dbname, $sql) {
+        $conn = connectDatabase($dbname);
+        if (mysqli_query($conn, $sql)) {
+            // echo "Record updated successfully";
+          } else {
+            echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+          }
+        mysqli_close($conn);
     }
 
     function removeData() {

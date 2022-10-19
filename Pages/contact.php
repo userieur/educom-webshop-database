@@ -13,8 +13,6 @@
     }
 
     function getContactData() {
-        $directory = "Data";
-        $file = "users.txt";
         $input = array(
             'sex' => array('type|select','label|Aanhef:','placeholder|Kies', 'options|man:Dhr.|woman:Mevr.')
            ,'fname' => array('type|text','label|Voornaam:','placeholder|Jan', 'checks|validName')
@@ -24,9 +22,8 @@
            ,'pref' => array('type|radio','label|Ik word het liefst benaderd via:', 'options|tel:Telefoon|mail:E-Mail')
            ,'story' => array('type|textbox','label|Reden van contact:','placeholder|Vul eens wat in dan!')
         );
-        $fileString = createFileString($directory, $file);
         $data = buildFormArray($input);
-        return(array('formArray' => $data, 'fileString' => $fileString));
+        return(array('formArray' => $data));
     }
 
     function showContactContent($page, $data) {

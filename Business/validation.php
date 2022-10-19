@@ -58,19 +58,9 @@
         return $error;
     }
 
-    function validLogin($value, $param=NULL) {
-        $error = NULL;
-        $fileString = $param['fileString'];
-        if (passwordMatchEmail($fileString, $value) == false) {
-            $error = "Password is incorrect";
-        }
-        return $error;
-    }
-
     function emailNotKnown($value, $param=NULL) {
         $error = NULL;
-        $fileString = $param['fileString'];
-        $exists = doesEmailExist($fileString, $value);
+        $exists = doesEmailExist($value);
         if ($exists == true) {
             $error = "E-Mail already exists";
         }
@@ -79,8 +69,7 @@
 
     function emailKnown($value, $param=NULL) {
         $error = NULL;
-        $fileString = $param['fileString'];
-        $exists = doesEmailExist($fileString, $value);
+        $exists = doesEmailExist($value);
         if ($exists == false) {
             $error = "E-Mail not known";
         }
@@ -95,9 +84,6 @@
     }
 
     function checkForError ($value, $check, $param=NULL) {
-        // echo($value);
-        // echo($check);
-        // var_dump($param);
         $param = $param ?? array();
         $checkArray = explode(":", $check);
         $functionName = $checkArray[0] ?? $check;
@@ -123,32 +109,24 @@
         return $output;
     }           
 
-    function checkDatabase ($key, $database) {
-        // open database
-        // check entry voor 
-        // finduser by email
-        // save user
-    }
-
     function matchRecord($value, $param=NULL) {
         $error = NULL;
-        $email = cleanInput($_POST['email']);
-        $fileString = $param['fileString'];
-        $exists = doesEmailExist($fileString, $email);
-        if ($exists == true) {
-            $userInfo = findUserByEmail($fileString, $email);
-            if ($value != cleanInput($userInfo[2])) {
+        if (isUserLoggedIn() == false) {
+            $email = cleanInput($_POST['email']);
+        } else {
+            $email = $_SESSION['email'];
+        }
+        $userInfo = findUserByEmail($email);
+            if ($value != cleanInput($userInfo['password'])) {
                 $error = "Password incorrect";
             }
-        }
         return $error;  
-    }
+        }
   
-
-    function validateForm($data, $fileString=NULL) {
+    function validateForm($data) {
         $output = $data;
         $noErrors = true;
-        $param = array('fileString' => $fileString);
+        $param = NULL;
         foreach($data as $key => $items) {
             if ($key != 'validForm') {
                 $checkedInput = validateInput($key, $items, $param);

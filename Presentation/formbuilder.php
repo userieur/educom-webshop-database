@@ -71,7 +71,7 @@ function showForm($page, $css, $data) {
         $placeholder = $items['placeholder'] ?? "";
         $options = $items['options'] ?? "";
         $value = $items['value'] ?? "";
-        echo($value);
+        // echo($value);
         $error = $items['error'] ?? "";
         switch ($type) {
             case 'text':

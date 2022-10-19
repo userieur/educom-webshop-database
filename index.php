@@ -2,9 +2,8 @@
     require_once("Presentation/pagebuilder.php");
     require_once("Business/basics.php");
     session_start();
-    // echo ($_SERVER["PHP_SELF"]);
-    // echo var_dump($_SERVER);
 
+    // echo($_SESSION['email']);
     $data=NULL;
     $page = getRequestedPage();
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -19,9 +18,7 @@
     $pageTitle = createTitle($page);
     showResponsePage($page, $pageTitle, $data);
 
-    // VAR-DUMP Template
-    // echo '<br> Ik ben bij ************ : <br>';
-    // var_dump($*********);
-
-    // var_dump($_SESSION);
+    // $email = 'test@test.nl';
+    // $ding = FindUserByEmail($email);
+    // var_dump($ding);
 ?>

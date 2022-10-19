@@ -6,15 +6,12 @@
     }
 
     function getLoginData() {
-        $directory = "Data";
-        $file = "users.txt";
         $input = array(
             'email' => array('type|email','label|E-Mail:','placeholder|jan.v.d.steen@provider.com','checks|validEmail|emailKnown')
             ,'pword' => array('type|password','label|Wachtwoord:','placeholder|vul wachtwoord in','checks|validPassword|matchRecord')
         );
-        $fileString = createFileString($directory, $file);
         $data = buildFormArray($input);
-        return(array('formArray' => $data, 'fileString' => $fileString));
+        return(array('formArray' => $data));
     }
 
     function showLoginContent($page, $data) {

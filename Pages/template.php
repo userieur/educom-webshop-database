@@ -19,9 +19,8 @@
             ,'pword' => array('type|password','label|Wachtwoord:','placeholder|vul wachtwoord in','checks|validPassword')
             ,'pwordcheck' => array('type|password','label|Herhaal wachtwoord:','placeholder|herhaal wachtwoord','checks|equalTo:pword')
         );
-        $fileString = createFileString($directory, $file);
         $data = buildFormArray($input);
-        return(array('formArray' => $data, 'fileString' => $fileString));
+        return(array('formArray' => $data));
     }
 
     function showXXXXXXXXXContent($page, $data) {
