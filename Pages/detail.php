@@ -15,6 +15,3 @@
         // var_dump($data);
         $css = 'webshop';
     }
-?>
-
-

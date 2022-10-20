@@ -21,6 +21,3 @@
         $css = 'contactform';
         showForm($page, $css, $data);
     }
-?>
-
-
