@@ -10,7 +10,6 @@
     }
 
     function createOptions ($string) {
-        // echo($string);
         $itemArray = explode("|", $string);
         $infoValue = array();
         $index = 1;
@@ -19,7 +18,6 @@
             $infoValue += [$option[0] => $option[1]];
             $index ++;
         }
-        // var_dump($infoValue);
         return ($infoValue);
     }
 
@@ -35,7 +33,6 @@
     }
     
     function buildFormArray ($array) {
-        // var_dump($array);
         $formArray = array('validForm' => false);
         foreach($array as $key => $info) {
             $formArray += [$key => array()];
@@ -56,7 +53,6 @@
 
 
     // BUSINESS
-
     function getAllProducts() {
         $conn = connectDatabase('r_webshop');
         $sql = $sql = "SELECT * from products";
@@ -166,13 +162,10 @@
                 }
             }
             $sql = "INSERT INTO invoice_lines (".$columnString.") VALUES (".$valueString.")";
-            // $sql = "INSERT INTO invoice_lines (invoice_id, sales_amount, sales_price, article_id) VALUES ('24', '1', '2', '4')";
-            // echo '<br><br>'.$sql.'<br>';
             writeData($conn, $sql);
         }
 
         mysqli_close($conn);
-        // insert all invoice lines
     }
 
     // CART STUFF
