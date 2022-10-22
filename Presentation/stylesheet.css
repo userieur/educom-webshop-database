@@ -87,6 +87,58 @@ footer > p {
   margin-right: 15px;
 }
 
+/* .container {
+  display: flex;
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+} */
+
+.webshop {
+  /* display: flex; /* or inline-flex */
+  /* flex-direction: row; */
+  /* flex-wrap: wrap; */
+  height: 400px;
+  width: 200px;
+  /* object-fit: fill; */
+}
+
+.webshop p.price {
+  margin: 5px 10px 5px 0;
+  font-size: 12px;
+  text-align: right;
+  display: inline
+}
+
+.webshop p.id {
+  display: inline
+}
+
+.webshop img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  overflow: hidden;
+}
+
+.webshop img.big {
+  width: 400px;
+  height: 400px;
+  object-fit: cover;
+  overflow: hidden;
+}
+
+.webshop img.cart {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  overflow: hidden;
+}
+
+.webshop form {
+  display: inline
+}
+
 .form {
   max-width: 800px;
   display: block;

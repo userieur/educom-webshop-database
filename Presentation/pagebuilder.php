@@ -14,6 +14,16 @@
         return $requested_page;
     }
 
+    function getVar($key, $default='') {
+        $requested_type = $_SERVER['REQUEST_METHOD']; 
+        if ($requested_type == 'POST') { 
+            $var = getPostVar($key,'postvar'); 
+        } else { 
+            $var = getUrlVar($key,'getvar'); 
+        } 
+        return $var;
+    }
+
     function getPostVar($key, $default='') { 
         $value = filter_input(INPUT_POST, $key); 
         return isset($value) ? $value : $default; 
@@ -75,18 +85,55 @@
                 }
                 break;
             case 'webshop':
-                $id = getUrlVar('id');
-                $detail_item = getDetailData($id);
-                var_dump($detail_item);
-                $data = $detail_item;
+                $name = getVar('name');
+                handleActions($name);
+                $data = NULL;
                 break;
             case 'detail':
+                $name = getVar('name');
+                handleActions($name);
+                $data = NULL;
                 break;
+            case 'cart':
+                $name = getVar('name');
+                handleActions($name);
+                $data = NULL;
             default:
                 //default
                 break;
             }
         return (array('page' => $page, 'data' => $data));
+    }
+
+    function handleActions($id) {
+        $action = getPostVar("action");
+        switch($action) {
+            case "addToCart":
+                if (array_key_exists($id, $_SESSION['cart'])) {
+                    $_SESSION['cart'][$id] += 1; 
+                } else {
+                    $_SESSION['cart'] += [$id => 1];
+                }
+                break;
+            case "removeFromCart":
+                if (!isset($_SESSION['cart'][$id])) {
+                    // do nothing;
+                } elseif ($_SESSION['cart'][$id] == 1) {
+                    unset($_SESSION['cart'][$id]); 
+                } else {
+                    $_SESSION['cart'][$id] -= 1;
+                }
+                break;
+            case "order":
+                if ($_SESSION['cart']) {
+                    placeOrder();
+                    unset($_SESSION['cart']);
+                    $_SESSION['cart'] = [];
+                } else {
+                    echo 'Mandje is leeg G'; 
+                }
+                break;
+        }
     }
 
     // Constructing the requested page + all functions
@@ -164,14 +211,17 @@
             case 'detail':
                 showDetailHeader();
                 break;
+            case 'cart':
+                showCartHeader();
+                break;
             default:
                 $page = 'home';
                 require_once('Pages/'.$page.'.php');
                 showHomeHeader();
                 break;
-        $pageString = 'Pages/'.$page.'.php';
-        require_once($pageString);
-        showPageHeader();
+        // $pageString = 'Pages/'.$page.'.php';
+        // require_once($pageString);
+        // showPageHeader();
         }
     }
 
@@ -194,6 +244,7 @@
             echo '<ul class="menu">
             <li><a class="' . (($page == "userpage") ? "active" : "") . '"href="index.php?page=userpage">UserPage</a></li>
             <li><a class="' . (($page == "loguit") ? "active" : "") . '"href="index.php?page=loguit">Loguit</a></li>
+            <li><a class="' . (($page == "cart") ? "active" : "") . '"href="index.php?page=cart">Cart</a></li>
           </ul>';  
         }
     }
@@ -233,15 +284,21 @@
             case 'webshop':
                 $data = $data ?? getWebshopData();
                 showWebshopContent($page, $data);
-                showItems($data);
+                showItems($page, $data);
                 break;
             case 'detail':
-                $id = getUrlVar('id');
+                $id = getVar('id');
+                // echo($id);
                 $detail_item = getDetailData($id);
                 // var_dump($detail_item);
                 $data = $detail_item;
                 showDetailContent($data);
-                showDetailItem($data);
+                showDetailItem($page, $data);
+                break;
+            case 'cart':
+                $data = $data ?? getCartData();
+                showCartContent($page, $data);
+                showCartItems($page, $data);
                 break;
             default:
                 require_once('Pages/home.php');
@@ -258,7 +315,8 @@
             ';
     } 
 
-    function showItems($data) {
+    function showItems($page, $data) {
+        echo '<div class="container">';
         foreach($data as $key => $info) {
             $id = $key;
             $name = $info['name'];
@@ -266,31 +324,79 @@
             $price = $info['price'];
             $description = $info['description'];
             echo '
-                <div>
-                    <p>ID = '.$id.'</p><br>
-                    <p>Name = <a href="index.php?page=detail&id='.$id.'">'.$name.'</a></p><br>
-                    <p>Imageurl = '.$imageurl.'</p><br>
-                    <p>Price = '.$price.'</p><br>
-                    <p>Description = '.$description.'</p><br>
-                </div>
-            ';
+            <div class="webshop">
+                <img src="Images/'.$imageurl.'" alt="'.$name.'"><br>
+                <p class="name"><a href="index.php?page=detail&id='.$id.'">'.$name.'</a></p><br>
+                <p class="id">Productnr. = '.$id.'</p>
+                <p class="price">€ '.$price.'</p>
+                <p class="description">'.$description.'</p><br>';
+            if (isset($_SESSION['user'])) {
+                addToCartForm($page, $name, $id);
+                removeFromCartForm($page, $name, $id);
+            }
+            echo '</div>';
+        echo '</div>';
         }
     }
 
-    function showDetailItem($info) {
+    function showDetailItem($page, $info) {
         $id = $info['id'];
         $name = $info['name'];
         $imageurl = $info['imageurl'];
         $price = $info['price'];
         $description = $info['description'];
         echo '
-            <div>
-                <p>ID = '.$id.'</p><br>
-                <p>Name = <a href="index.php?page=detail&id='.$id.'">'.$name.'</a></p><br>
-                <p>Imageurl = '.$imageurl.'</p><br>
-                <p>Price = '.$price.'</p><br>
-                <p>Description = '.$description.'</p><br>
-            </div>
-        ';
+        <div class="webshop">
+            <img class="big" src="Images/'.$imageurl.'" alt="'.$name.'"><br>
+            <p class="name">'.$name.'</a></p><br>
+            <p class="id">Productnr. = '.$id.'</p>
+            <p class="price">€ '.$price.'</p>
+            <p class="description">'.$description.'</p><br>';
+        if (isset($_SESSION['user'])) {
+            addToCartForm($page, $name, $id);
+            removeFromCartForm($page, $name, $id);
+        }
+        echo '</div>';
+    }
+
+    function showCartItems($page, $data) {
+        echo '<div class="container">';
+        $grandTotal = 0;
+        $_SESSION['invoicelines'] = [];
+        if ($data) {
+            foreach($data as $key => $info) {
+                $id = $key;
+                $name = $info['name'];
+                $imageurl = $info['imageurl'];
+                $price = $info['price'];
+                $description = $info['description'];
+                $count = $_SESSION['cart'][$name];
+                $_SESSION['invoicelines'] += [$name => array()];
+                $_SESSION['invoicelines'][$name] += ['sales_amount' => $count];
+                $_SESSION['invoicelines'][$name] += ['sales_price' => $price];
+                $_SESSION['invoicelines'][$name] += ['article_id' => $id];
+                echo '
+                <div class="webshop">
+                    <img class="cart" src="Images/'.$imageurl.'" alt="'.$name.'"><br>
+                    <p class="name"><a href="index.php?page=detail&id='.$id.'">'.$name.'</a></p><br>
+                    <p class="count">Items'.$count.'</p>
+                    <p class="price">€ '.$price.'</p>
+                    <p class="subtotal">€ '.$count*$price.'</p>
+                    <p class="description">'.$description.'</p><br>';
+                if (isset($_SESSION['user'])) {
+                    addToCartForm($page, $name, $id);
+                    removeFromCartForm($page, $name, $id);
+                }
+                $grandTotal += ($count*$price);
+                echo '</div>';
+            echo '</div>';
+            }
+            echo '<p class="total">Total = € '.$grandTotal.'</p><br>';
+            orderForm($page, $name, $id);
+        }
+         else {
+            echo 'cart is empty G';
+            unset($_SESSION['invoicelines']);
+        }
     }
 ?>

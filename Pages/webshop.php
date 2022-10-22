@@ -13,7 +13,6 @@
     function showWebshopContent($page, $data) {
         echo '<h3>Webshop inhoud</h3><br>';
         // var_dump($data);
-        $css = 'webshop';
     }
 ?>
 

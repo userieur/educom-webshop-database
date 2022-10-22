@@ -65,9 +65,31 @@
         return $items;
     }
 
+    function getProductsByIdArray($array) {
+        $conn = connectDatabase('r_webshop');
+        $idString = "";
+        $count = 0;
+        // var_dump($array);
+        if ($array){
+            foreach ($array as $id => $amount) {
+                if ((count($array)-$count) > 1) {
+                    $idString.="'".$id."', ";
+                    $count += 1;
+                } else {
+                    $idString.="'".$id."'";
+                }
+            }
+            $sql = "SELECT * from products WHERE name IN (".$idString.")";
+            // echo($sql);
+            $output = readData($conn, $sql);
+            mysqli_close($conn);
+            return $output;
+        }
+    }
+
     function getProductById($id) {
         $conn = connectDatabase('r_webshop');
-        $sql = $sql = "SELECT * from products WHERE id='".$id."'";
+        $sql = "SELECT * from products WHERE id='".$id."'";
         $items = readData($conn, $sql);
         $values = array_values($items);
         $output = $values[0];
@@ -103,10 +125,94 @@
         updateData('r_webshop', $sql);
     }    
 
+    function createInvoiceNumber() {
+        // functie maken die een format invoiceNumber aanlevert
+        // eerst de laatste pakken uit de invoice database
+        // dan volgens eigen stijl aanpassen
+        // bijv: YYYYMMDD####
+        // de #### optellen en beginnen bij 0001 elke dag
+        // dus select last
+        // als YYYYMMDD = die van last, dan #### + 1 => YYYYMMDD####+1
+        // else YYYYMMDD0001
+        // return
+    }
+
+    function placeOrder() {
+        $conn = connectDatabase('r_webshop');
+        $sqlInfo = $_SESSION['invoicelines'];
+        $userId = $_SESSION['userId'];
+        $invoiceNum = 10;
+        $sql = "INSERT INTO invoices (user_id, invoice_num) VALUES ('".$userId."', '".$invoiceNum."')";
+        writeData($conn, $sql);
+        $sql = "SELECT id from invoices ORDER BY ID DESC LIMIT 1";
+        $output = readData($conn, $sql);
+        $values = array_values($output);
+        $invoiceId = $values[0];
+        $invoiceId = $invoiceId['id'];
+        var_dump($invoiceId);
+
+        foreach ($sqlInfo as $product) {
+            $columnString = "invoice_id, ";
+            $valueString = "'".$invoiceId."', ";
+            $count = 0;
+            foreach ($product as $column => $value) {
+                if ((count($sqlInfo)-$count) > 1) {
+                    $columnString.=$column.", ";
+                    $valueString.="'".$value."', ";
+                    $count += 1;
+                } else {
+                    $columnString.=$column;
+                    $valueString.="'".$value."'";
+                }
+            }
+            $sql = "INSERT INTO invoice_lines (".$columnString.") VALUES (".$valueString.")";
+            // $sql = "INSERT INTO invoice_lines (invoice_id, sales_amount, sales_price, article_id) VALUES ('24', '1', '2', '4')";
+            // echo '<br><br>'.$sql.'<br>';
+            writeData($conn, $sql);
+        }
+
+        mysqli_close($conn);
+        // insert all invoice lines
+    }
+
+    // CART STUFF
+    function addToCartForm($page, $name, $id) {
+        echo'
+        <form method="POST" action="index.php">
+        <input type="hidden" id="page" name="page" value="' . $page . '">
+        <input type="hidden" id="action" name="action" value="addToCart">
+        <input type="hidden" id="name" name="name" value="'.$name.'">
+        <input type="hidden" id="id" name="id" value="'.$id.'">
+        <input type="submit" value="Add">
+        </form>';
+    }
+
+    function removeFromCartForm($page, $name, $id) {
+        echo'
+        <form method="POST" action="index.php">
+        <input type="hidden" id="page" name="page" value="' . $page . '">
+        <input type="hidden" id="action" name="action" value="removeFromCart">
+        <input type="hidden" id="name" name="name" value="'.$name.'">
+        <input type="hidden" id="id" name="id" value="'.$id.'">
+        <input type="submit" value="Remove">
+        </form>';
+    }
+
+    function orderForm($page, $name, $id) {
+        echo'
+        <form method="POST" action="index.php">
+        <input type="hidden" id="page" name="page" value="' . $page . '">
+        <input type="hidden" id="action" name="action" value="order">
+        <input type="submit" value="Order">
+        </form>';
+    }
+
     // SESSION MANAGER
     function doLoginUser($userInfo) {
         $_SESSION['user'] = $userInfo['username'];
+        $_SESSION['userId'] = $userInfo['id'];
         $_SESSION['email'] = $userInfo['email'];
+        $_SESSION['cart'] = array();
     }
 
     function isUserLoggedIn() {
@@ -167,7 +273,7 @@
 
     function writeData($conn, $sql) {
         if (mysqli_query($conn, $sql)) {
-            echo "New record created successfully";
+            // echo "New record created successfully";
           } else {
             echo "Error: " . $sql . "<br>" . mysqli_error($conn);
           }

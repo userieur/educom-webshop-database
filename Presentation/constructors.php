@@ -1,5 +1,7 @@
 <?php
 
+    function container();
+    
 // Hier komen alle constructor functies voor HTML code
 
 // Stap 1 is de source code van home & about te fiksen
