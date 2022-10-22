@@ -219,9 +219,6 @@
                 require_once('Pages/'.$page.'.php');
                 showHomeHeader();
                 break;
-        // $pageString = 'Pages/'.$page.'.php';
-        // require_once($pageString);
-        // showPageHeader();
         }
     }
 
@@ -288,10 +285,7 @@
                 break;
             case 'detail':
                 $id = getVar('id');
-                // echo($id);
-                $detail_item = getDetailData($id);
-                // var_dump($detail_item);
-                $data = $detail_item;
+                $data = getDetailData($id);;
                 showDetailContent($data);
                 showDetailItem($page, $data);
                 break;

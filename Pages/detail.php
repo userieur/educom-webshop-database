@@ -12,6 +12,4 @@
 
     function showDetailContent($data) {
         echo '<h3>De Details...</h3><br>';
-        // var_dump($data);
-        $css = 'webshop';
     }

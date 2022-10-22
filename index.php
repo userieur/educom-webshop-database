@@ -3,9 +3,6 @@
     require_once("Business/basics.php");
     session_start();
 
-    var_dump($_SESSION);
-
-    // echo($_SESSION['email']);
     $data=NULL;
     $page = getRequestedPage();
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -19,10 +16,5 @@
     }
     $pageTitle = createTitle($page);
     showResponsePage($page, $pageTitle, $data);
-    // var_dump($_SESSION);
 
-
-    // $email = 'test@test.nl';
-    // $ding = FindUserByEmail($email);
-    // var_dump($ding);
 ?>

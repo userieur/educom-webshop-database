@@ -16,7 +16,6 @@
 
     function showLoginContent($page, $data) {
         echo '<h3>HIERRR INLOGGEN</h3><br>';
-        // var_dump($data);
         $css = 'contactform';
         showForm($page, $css, $data);
     }

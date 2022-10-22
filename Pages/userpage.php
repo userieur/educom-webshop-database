@@ -17,7 +17,6 @@
 
     function showUserContent($page, $data) {
         echo '<h3>WW aanpasseeeeen</h3><br>';
-        // var_dump($data);
         $css = 'contactform';
         showForm($page, $css, $data);
     }

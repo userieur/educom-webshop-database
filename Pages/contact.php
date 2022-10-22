@@ -1,9 +1,6 @@
 <?php
     require_once("Presentation/formbuilder.php");
-    
-    $directory = "Data";
-    $file = "users.txt";
-    
+       
     function getContactTitle() {
         return 'All your data are belong to (contact) us';
     }

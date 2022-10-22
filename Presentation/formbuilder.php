@@ -13,14 +13,11 @@ function showForm($page, $css, $data) {
     }
 
     function showFormItems($data) {
-        // print_r($data);
         foreach($data as $key => $items){
             switch($key) {
                 case 'validForm':
-                    // var_dump($data['validForm']);
                     break;
                 default:
-                    // print_r($items);
                     showFormItem($key, $items);
                     break;
             }
@@ -35,14 +32,12 @@ function showForm($page, $css, $data) {
 
 
     function showFormItem($key, $items) {
-        // var_dump($items);
         createLabel($key, $items);
         createInputField($key, $items);
         createSpan($key, $items);
     }
 
     function createLabel($key, $items) {
-        // var_dump($items);
         $type = $items['type'];
         $label = $items['label'];
         switch ($type) {
@@ -71,7 +66,6 @@ function showForm($page, $css, $data) {
         $placeholder = $items['placeholder'] ?? "";
         $options = $items['options'] ?? "";
         $value = $items['value'] ?? "";
-        // echo($value);
         $error = $items['error'] ?? "";
         switch ($type) {
             case 'text':
@@ -119,7 +113,6 @@ function showForm($page, $css, $data) {
         foreach($data as $key => $item) {
             switch($key) {
                 case 'validForm':
-                    // var_dump($data['validForm']);
                     break;
                 default:
                     $value = $item['value'];
