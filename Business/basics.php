@@ -94,11 +94,7 @@
        
     function doesEmailExist($email) {
         $userInfo = findUserByEmail($email);
-        $emailExists = false;
-        if ($userInfo !== "NO_DATA_FOUND") {
-            $emailExists = true;
-        }
-        return $emailExists;
+        return !empty($userInfo);
     }
 
     function storeUser($userInfo) {
@@ -230,13 +226,11 @@
     // DATA
 
     function FindUserByEmail($email) {      
-        $sql = "SELECT * from users WHERE email = '" . $email . "'";
         $conn = connectDatabase('r_webshop');
+        $sql = "SELECT * from users WHERE email = '" . $email . "'";
         $output = readData($conn, $sql);
-        $values = array_values($output);
-        $output = $values[0];
         mysqli_close($conn);
-        return $output;
+        return empty($output) ? NULL : $output[0]; 
     }
 
     function connectDatabase($dbname) {
@@ -265,8 +259,6 @@
                 $output[] = $row;
                 }
             }
-        } else {
-        $output = "NO_DATA_FOUND";
         }
         return $output;
     }
