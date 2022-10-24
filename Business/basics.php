@@ -1,14 +1,5 @@
 <?php
 
-    function varCheck ($value) {
-        if (isset($value)) {
-            $output = $value;
-        } else {
-            $output = "";
-        }
-        return $output;
-    }
-
     function createOptions ($string) {
         $itemArray = explode("|", $string);
         $infoValue = array();
@@ -116,23 +107,39 @@
         mysqli_close($conn);
     }    
 
+    function currentDate () {
+        date_default_timezone_set('Europe/Amsterdam');
+        $date = date('Ymd');
+        return $date;
+    }
+
     function createInvoiceNumber() {
-        // functie maken die een format invoiceNumber aanlevert
-        // eerst de laatste pakken uit de invoice database
-        // dan volgens eigen stijl aanpassen
-        // bijv: YYYYMMDD####
-        // de #### optellen en beginnen bij 0001 elke dag
-        // dus select last
-        // als YYYYMMDD = die van last, dan #### + 1 => YYYYMMDD####+1
-        // else YYYYMMDD0001
-        // return
+        $date = currentDate();
+        $conn = connectDatabase('r_webshop');
+        $sql = "SELECT invoice_num from invoices ORDER BY ID DESC LIMIT 1";
+        $output = readData($conn, $sql);
+        
+        $values = array_values($output);
+        $string = $values[0]['invoice_num'];
+
+        if (str_contains($string, $date)) {
+            $count = substr($string, -4);
+            $int = intval($count);
+            $int += 1;
+            $count = str_pad(strval($int), 4, '0', STR_PAD_LEFT);
+            $invoiceNumber = $date.$count;
+        } else {
+            $invoiceNumber = $date."0001";
+        }
+        echo($invoiceNumber);
+        return $invoiceNumber;
     }
 
     function placeOrder() {
         $conn = connectDatabase('r_webshop');
         $invoiceLines = $_SESSION['invoicelines'];
         $userId = $_SESSION['userId'];
-        $invoiceNum = 10; // createInvoiceNumber();
+        $invoiceNum = createInvoiceNumber();
         
         // Create invoice
         $sql = "INSERT INTO invoices (user_id, invoice_num) VALUES ('".$userId."', '".$invoiceNum."')";
@@ -229,8 +236,12 @@
         $conn = connectDatabase('r_webshop');
         $sql = "SELECT * from users WHERE email = '" . $email . "'";
         $output = readData($conn, $sql);
+        // var_dump($output);
+        $values = array_values($output);
+        $id = $values[0]['id'];
         mysqli_close($conn);
-        return empty($output) ? NULL : $output[0]; 
+        // VRAAG: Het voelt of deze functie slimmer kan.... Hoe?
+        return empty($output) ? NULL : $output[$id]; 
     }
 
     function connectDatabase($dbname) {
