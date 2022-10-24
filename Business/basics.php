@@ -76,7 +76,6 @@
                 }
             }
             $sql = "SELECT * from products WHERE name IN (".$idString.")";
-            // echo($sql);
             $output = readData($conn, $sql);
             mysqli_close($conn);
             return $output;
@@ -103,22 +102,22 @@
     }
 
     function storeUser($userInfo) {
-        $username = $userInfo['username'];
-        $password = $userInfo['password'];
-        $email = $userInfo['email'];
-        $sql = "INSERT INTO users (email, username, password) VALUES ('".$email."','".$username."','".$password."')";
-        echo($sql);
         $conn = connectDatabase('r_webshop');
+        $username = cleanSQLInput($conn, $userInfo['username']);
+        $password = cleanSQLInput($conn, $userInfo['password']);
+        $email = cleanSQLInput($conn, $userInfo['email']);
+        $sql = "INSERT INTO users (email, username, password) VALUES ('".$email."','".$username."','".$password."')";
         writeData($conn, $sql);
         mysqli_close($conn);
     }
 
     function updatePassword($userInfo) {
-        $email = $userInfo['email'];
-        $password = $userInfo['password'];
+        $conn = connectDatabase('r_webshop');
+        $email = cleanSQLInput($conn, $userInfo['email']);
+        $password = cleanSQLInput($conn, $userInfo['password']);
         $sql = "UPDATE users SET password='".$password."' WHERE email='".$email."'";
-        // echo($sql);
-        updateData('r_webshop', $sql);
+        updateData($conn, $sql);
+        mysqli_close($conn);
     }    
 
     function createInvoiceNumber() {
@@ -135,24 +134,28 @@
 
     function placeOrder() {
         $conn = connectDatabase('r_webshop');
-        $sqlInfo = $_SESSION['invoicelines'];
+        $invoiceLines = $_SESSION['invoicelines'];
         $userId = $_SESSION['userId'];
-        $invoiceNum = 10;
+        $invoiceNum = 10; // createInvoiceNumber();
+        
+        // Create invoice
         $sql = "INSERT INTO invoices (user_id, invoice_num) VALUES ('".$userId."', '".$invoiceNum."')";
         writeData($conn, $sql);
+        
+        // Retrieve invoice number of created invoice from database
         $sql = "SELECT id from invoices ORDER BY ID DESC LIMIT 1";
         $output = readData($conn, $sql);
+        
         $values = array_values($output);
-        $invoiceId = $values[0];
-        $invoiceId = $invoiceId['id'];
-        var_dump($invoiceId);
+        $invoiceId = $values[0]['id'];
 
-        foreach ($sqlInfo as $product) {
+        // Create SQL-strings for each invoice-line and insert them in invoice_lines database
+        foreach ($invoiceLines as $line) {
             $columnString = "invoice_id, ";
             $valueString = "'".$invoiceId."', ";
             $count = 0;
-            foreach ($product as $column => $value) {
-                if ((count($sqlInfo)-$count) > 1) {
+            foreach ($line as $column => $value) {
+                if ((count($line)-$count) > 1) {
                     $columnString.=$column.", ";
                     $valueString.="'".$value."', ";
                     $count += 1;
@@ -198,6 +201,10 @@
         <input type="hidden" id="action" name="action" value="order">
         <input type="submit" value="Order">
         </form>';
+    }
+
+    function cleanSQLInput($conn, $value) {
+        return mysqli_real_escape_string($conn, $value);
     }
 
     // SESSION MANAGER
@@ -266,7 +273,7 @@
 
     function writeData($conn, $sql) {
         if (mysqli_query($conn, $sql)) {
-            // echo "New record created successfully";
+            // fffffff
           } else {
             echo "Error: " . $sql . "<br>" . mysqli_error($conn);
           }
@@ -274,7 +281,7 @@
 
     function updateData($conn, $sql) {
         if (mysqli_query($conn, $sql)) {
-            // echo "Record updated successfully";
+            // fffffffffffff
           } else {
             echo "Error: " . $sql . "<br>" . mysqli_error($conn);
           }
